@@ -22,7 +22,6 @@ import ms from 'ms';
       inject: [ConfigService],
     }),
     UsersModule,
-    UsersModule,
     PassportModule,
   ],
   exports: [AuthService],

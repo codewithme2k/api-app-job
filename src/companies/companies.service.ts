@@ -1,26 +1,84 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Company, CompanyDocument } from './schemas/company.schema';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { IUser } from 'src/users/users.interface';
+import mongoose from 'mongoose';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class CompaniesService {
-  create(createCompanyDto: CreateCompanyDto) {
-    return 'This action adds a new company';
+  constructor(
+    @InjectModel(Company.name)
+    private CompanyModel: SoftDeleteModel<CompanyDocument>,
+  ) {}
+  create(createCompanyDto: CreateCompanyDto, user: IUser) {
+    console.log(createCompanyDto);
+    return this.CompanyModel.create({
+      ...createCompanyDto,
+      createdBy: {
+        _id: user._id,
+        name: user.name,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll(currentPage: number, limit: number, qs: string) {
+    const { filter, sort, population } = aqp(qs);
+    delete filter.current;
+    delete filter.pageSize;
+    const offset = (currentPage - 1) * +limit;
+    const defaulLimit = +limit ? +limit : 10;
+    const totalItems = (await this.CompanyModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaulLimit);
+
+    const result = await this.CompanyModel.find(filter)
+      .skip(offset)
+      .limit(defaulLimit)
+      .sort(sort as any)
+      .populate(population)
+      .exec();
+    return {
+      meta: {
+        currentPage: currentPage,
+        pageSize: limit,
+        page: totalPages,
+        total: totalItems,
+      },
+      result,
+    };
   }
 
   findOne(id: number) {
     return `This action returns a #${id} company`;
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
+    return await this.CompanyModel.updateOne(
+      { _id: id },
+      {
+        ...updateCompanyDto,
+        UpdatedBy: {
+          _id: user._id,
+          name: user.name,
+        },
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id)) return 'not found Company';
+    await this.CompanyModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          name: user.name,
+        },
+      },
+    );
+    return this.CompanyModel.softDelete({ _id: id });
   }
 }
