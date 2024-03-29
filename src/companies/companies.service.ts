@@ -68,6 +68,7 @@ export class CompaniesService {
     );
   }
 
+<<<<<<< HEAD
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) return 'not found Company';
     await this.CompanyModel.updateOne(
@@ -80,5 +81,9 @@ export class CompaniesService {
       },
     );
     return this.CompanyModel.softDelete({ _id: id });
+=======
+  remove(id: number) {
+    
+>>>>>>> 0cae0835e1116c6cf1181d930eee2f43441715e5
   }
 }
