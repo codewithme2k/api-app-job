@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
@@ -44,15 +43,5 @@ export class CompaniesController {
     @User() user: IUser,
   ) {
     return this.companiesService.update(id, updateCompanyDto, user);
-  }
-
-  @Delete(':id')
-<<<<<<< HEAD
-  remove(@Param('id') id: string, @User() user: IUser) {
-    return this.companiesService.remove(id, user);
-=======
-  remove(@Param('id') id: string) {
-    return this.companiesService.remove(id);
->>>>>>> 0cae0835e1116c6cf1181d930eee2f43441715e5
   }
 }

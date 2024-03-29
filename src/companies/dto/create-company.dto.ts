@@ -1,19 +1,5 @@
-import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsNotEmptyObject,
-  IsObject,
-  ValidateNested,
-} from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
-class Company {
-  @IsNotEmpty()
-  _id: string;
-
-  @IsNotEmpty()
-  name: string;
-}
 export class CreateCompanyDto {
   @IsNotEmpty({ message: 'Name Không được để trống' })
   name: string;
