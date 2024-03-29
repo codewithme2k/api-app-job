@@ -28,7 +28,7 @@ export class CompaniesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.companiesService.findOne(+id);
+    return this.companiesService.findOne(id);
   }
 
   @Patch(':id')
@@ -38,6 +38,6 @@ export class CompaniesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.companiesService.remove(+id);
+    return this.companiesService.remove(id);
   }
 }
