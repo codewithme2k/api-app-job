@@ -15,9 +15,13 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { Response } from 'express';
 import { IUser } from 'src/users/users.interface';
 import { Request } from 'express';
+import { RolesService } from 'src/roles/roles.service';
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private rolesService: RolesService,
+  ) {}
 
   @ResponseMessage('fetch auth login')
   @Public()
@@ -33,10 +37,15 @@ export class AuthController {
     console.log(registerUserDto);
     return this.authService.register(registerUserDto);
   }
-  @ResponseMessage('account ')
+  @ResponseMessage('Get information user')
   @Get('account')
-  getAccount(@User() user: IUser) {
-    return user;
+  async getAccount(@User() user: IUser) {
+    console.log(user.role._id);
+    const temp = (await this.rolesService.findOne(user.role._id)) as any;
+
+    user.permissions = temp.permissions;
+
+    return { user };
   }
   @Public()
   @ResponseMessage('Get user by refresh token')
@@ -48,6 +57,7 @@ export class AuthController {
     const refreshToken = request.cookies['refresh_token'];
     return this.authService.processNewToken(refreshToken, response);
   }
+
   @ResponseMessage('Logout user')
   @Post('/logout')
   handleLogout(

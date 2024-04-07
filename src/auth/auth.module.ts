@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import ms from 'ms';
+import { RolesModule } from 'src/roles/roles.module';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -23,6 +24,7 @@ import ms from 'ms';
     }),
     UsersModule,
     PassportModule,
+    RolesModule,
   ],
   exports: [AuthService],
   providers: [AuthService, LocalStrategy, JwtStrategy],

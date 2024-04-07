@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company, CompanyDocument } from './schemas/company.schema';
@@ -15,7 +15,6 @@ export class CompaniesService {
     private CompanyModel: SoftDeleteModel<CompanyDocument>,
   ) {}
   create(createCompanyDto: CreateCompanyDto, user: IUser) {
-    console.log(createCompanyDto);
     return this.CompanyModel.create({
       ...createCompanyDto,
       createdBy: {
@@ -52,7 +51,9 @@ export class CompaniesService {
   }
 
   findOne(id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return 'not found COMPANY';
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('not found company id');
+    }
     return this.CompanyModel.findOne({ _id: id });
   }
 
